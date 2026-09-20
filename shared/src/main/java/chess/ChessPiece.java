@@ -533,6 +533,182 @@ public class ChessPiece {
             }
         }
 
+        // Pawn
+        if (type == PieceType.PAWN) {
+
+            int direction;
+
+            if (pieceColor == ChessGame.TeamColor.WHITE) {
+                direction = 1;
+            }
+            else {
+                direction = -1;
+            }
+
+            // Moving Forward
+            int newRow = row + direction;
+
+            if (newRow >= 1 && newRow <= 8) {
+                ChessPosition newPosition = new ChessPosition(newRow, col);
+                ChessPiece piece = board.getPiece(newPosition);
+
+                if (piece == null) {
+
+                    // Promotion
+                    if ((pieceColor == ChessGame.TeamColor.WHITE && newRow == 8) ||
+                            (pieceColor == ChessGame.TeamColor.BLACK && newRow == 1)) {
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.QUEEN
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.ROOK
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.BISHOP
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.KNIGHT
+                        ));
+                    }
+                    else {
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                null
+                        ));
+                    }
+                }
+            }
+
+            // Moving Forward Two Spaces
+            if ((pieceColor == ChessGame.TeamColor.WHITE && row == 2) ||
+                    (pieceColor == ChessGame.TeamColor.BLACK && row == 7)) {
+
+                int firstRow = row + direction;
+                int secondRow = row + (direction * 2);
+
+                ChessPosition firstPosition = new ChessPosition(firstRow, col);
+                ChessPosition secondPosition = new ChessPosition(secondRow, col);
+
+                ChessPiece firstPiece = board.getPiece(firstPosition);
+                ChessPiece secondPiece = board.getPiece(secondPosition);
+
+                if (firstPiece == null && secondPiece == null) {
+                    moves.add(new ChessMove(
+                            myPosition,
+                            secondPosition,
+                            null
+                    ));
+                }
+            }
+
+            // Attacking Left
+            int newCol = col - 1;
+
+            if (newCol >= 1 && newRow >= 1 && newRow <= 8) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece piece = board.getPiece(newPosition);
+
+                if (piece != null && piece.getTeamColor() != pieceColor) {
+
+                    // Promotion
+                    if ((pieceColor == ChessGame.TeamColor.WHITE && newRow == 8) ||
+                            (pieceColor == ChessGame.TeamColor.BLACK && newRow == 1)) {
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.QUEEN
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.ROOK
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.BISHOP
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.KNIGHT
+                        ));
+                    }
+                    else {
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                null
+                        ));
+                    }
+                }
+            }
+
+            // Attacking Right
+            newCol = col + 1;
+
+            if (newCol <= 8 && newRow >= 1 && newRow <= 8) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece piece = board.getPiece(newPosition);
+
+                if (piece != null && piece.getTeamColor() != pieceColor) {
+
+                    // Promotion
+                    if ((pieceColor == ChessGame.TeamColor.WHITE && newRow == 8) ||
+                            (pieceColor == ChessGame.TeamColor.BLACK && newRow == 1)) {
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.QUEEN
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.ROOK
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.BISHOP
+                        ));
+
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                PieceType.KNIGHT
+                        ));
+                    }
+                    else {
+                        moves.add(new ChessMove(
+                                myPosition,
+                                newPosition,
+                                null
+                        ));
+                    }
+                }
+            }
+        }
+
         return moves;
     }
 }
