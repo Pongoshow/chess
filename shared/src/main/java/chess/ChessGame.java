@@ -8,6 +8,7 @@ import java.util.Objects;
 //4/8
 //5/8
 //6/8
+//7/8
 /**
  * A class that can manage a chess game, making moves on a board
  * <p>
