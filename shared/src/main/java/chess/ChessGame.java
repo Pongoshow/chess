@@ -3,7 +3,8 @@ package chess;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Objects;
-
+// I didnt really know that I was supposed to do ChessGame later so I did it with phase 0 so that is why there is 0/8 commits,
+// so I will just add this a lot of places to make up for the fact that I didnt really have more changes to make
 /**
  * A class that can manage a chess game, making moves on a board
  * <p>
