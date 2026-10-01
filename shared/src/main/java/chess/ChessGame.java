@@ -7,6 +7,7 @@ import java.util.Objects;
 // so I will just add this a lot of places to make up for the fact that I didnt really have more changes to make
 //4/8
 //5/8
+//6/8
 /**
  * A class that can manage a chess game, making moves on a board
  * <p>
