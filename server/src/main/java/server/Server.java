@@ -1,8 +1,11 @@
 package server;
 
+import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.Javalin;
-import service.ClearService;
+import model.AuthData;
+import model.UserData;
+import service.*;
 
 public class Server {
 
@@ -13,6 +16,9 @@ public class Server {
     private final GameDAO gameDAO;
 
     private final ClearService clearService;
+    private final UserService userService;
+
+    private final Gson gson = new Gson();
 
     public Server() {
 
@@ -21,9 +27,11 @@ public class Server {
         gameDAO = new MemoryGameDAO();
 
         clearService = new ClearService(userDAO, authDAO, gameDAO);
+        userService = new UserService(userDAO, authDAO);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
+        // CLEAR
         javalin.delete("/db", ctx -> {
             try {
                 clearService.clear();
@@ -38,6 +46,52 @@ public class Server {
                 );
             }
         });
+
+        // REGISTER
+        javalin.post("/user", ctx -> {
+            try {
+                RegisterRequest request =
+                        gson.fromJson(ctx.body(), RegisterRequest.class);
+
+                UserData user = new UserData(
+                        request.username(),
+                        request.password(),
+                        request.email()
+                );
+
+                AuthData auth = userService.register(user);
+
+                RegisterResult result = new RegisterResult(
+                        auth.username(),
+                        auth.authToken()
+                );
+
+                ctx.status(200);
+                ctx.result(gson.toJson(result));
+
+            } catch (BadRequestException e) {
+                ctx.status(400);
+                ctx.result(
+                        "{\"message\":\"Error: bad request\"}"
+                );
+
+            } catch (AlreadyTakenException e) {
+                ctx.status(403);
+                ctx.result(
+                        "{\"message\":\"Error: already taken\"}"
+                );
+
+            } catch (DataAccessException e) {
+                ctx.status(500);
+                ctx.result(
+                        gson.toJson(
+                                new ErrorResponse(
+                                        "Error: " + e.getMessage()
+                                )
+                        )
+                );
+            }
+        });
     }
 
     public int run(int desiredPort) {
@@ -47,5 +101,8 @@ public class Server {
 
     public void stop() {
         javalin.stop();
+    }
+
+    private record ErrorResponse(String message) {
     }
 }
