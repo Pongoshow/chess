@@ -27,10 +27,14 @@ public class Server {
         javalin.delete("/db", ctx -> {
             try {
                 clearService.clear();
-                ctx.status(200).json(new Object());
+
+                ctx.status(200);
+                ctx.result("{}");
+
             } catch (DataAccessException e) {
-                ctx.status(500).json(
-                        new ErrorResponse("Error: " + e.getMessage())
+                ctx.status(500);
+                ctx.result(
+                        "{\"message\":\"Error: " + e.getMessage() + "\"}"
                 );
             }
         });
@@ -43,8 +47,5 @@ public class Server {
 
     public void stop() {
         javalin.stop();
-    }
-
-    private record ErrorResponse(String message) {
     }
 }
