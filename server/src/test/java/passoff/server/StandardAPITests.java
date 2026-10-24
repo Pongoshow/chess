@@ -13,16 +13,13 @@ import java.util.Locale;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StandardAPITests {
-
     private static TestUser existingUser;
     private static TestUser newUser;
     private static TestCreateRequest createRequest;
     private static TestServerFacade serverFacade;
     private static Server server;
     private String existingAuth;
-
     // ### TESTING SETUP/CLEANUP ###
-
     @AfterAll
     static void stopServer() {
         server.stop();
