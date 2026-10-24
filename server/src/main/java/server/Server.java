@@ -191,6 +191,49 @@ public class Server {
                 );
             }
         });
+
+        // CREATE GAME
+        javalin.post("/game", ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+
+                CreateGameRequest request =
+                        gson.fromJson(ctx.body(), CreateGameRequest.class);
+
+                int gameID = gameService.createGame(
+                        request.gameName(),
+                        authToken
+                );
+
+                CreateGameResult result =
+                        new CreateGameResult(gameID);
+
+                ctx.status(200);
+                ctx.result(gson.toJson(result));
+
+            } catch (BadRequestException e) {
+                ctx.status(400);
+                ctx.result(
+                        "{\"message\":\"Error: bad request\"}"
+                );
+
+            } catch (UnauthorizedException e) {
+                ctx.status(401);
+                ctx.result(
+                        "{\"message\":\"Error: unauthorized\"}"
+                );
+
+            } catch (DataAccessException e) {
+                ctx.status(500);
+                ctx.result(
+                        gson.toJson(
+                                new ErrorResponse(
+                                        "Error: " + e.getMessage()
+                                )
+                        )
+                );
+            }
+        });
     }
 
     public int run(int desiredPort) {
