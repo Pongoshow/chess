@@ -234,6 +234,53 @@ public class Server {
                 );
             }
         });
+
+        // JOIN GAME
+        javalin.put("/game", ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+
+                JoinGameRequest request =
+                        gson.fromJson(ctx.body(), JoinGameRequest.class);
+
+                gameService.joinGame(
+                        request.gameID(),
+                        request.playerColor(),
+                        authToken
+                );
+
+                ctx.status(200);
+                ctx.result("{}");
+
+            } catch (BadRequestException e) {
+                ctx.status(400);
+                ctx.result(
+                        "{\"message\":\"Error: bad request\"}"
+                );
+
+            } catch (UnauthorizedException e) {
+                ctx.status(401);
+                ctx.result(
+                        "{\"message\":\"Error: unauthorized\"}"
+                );
+
+            } catch (AlreadyTakenException e) {
+                ctx.status(403);
+                ctx.result(
+                        "{\"message\":\"Error: already taken\"}"
+                );
+
+            } catch (DataAccessException e) {
+                ctx.status(500);
+                ctx.result(
+                        gson.toJson(
+                                new ErrorResponse(
+                                        "Error: " + e.getMessage()
+                                )
+                        )
+                );
+            }
+        });
     }
 
     public int run(int desiredPort) {
