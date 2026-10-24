@@ -92,6 +92,49 @@ public class Server {
                 );
             }
         });
+
+        // LOGIN
+        javalin.post("/session", ctx -> {
+            try {
+                LoginRequest request =
+                        gson.fromJson(ctx.body(), LoginRequest.class);
+
+                AuthData auth = userService.login(
+                        request.username(),
+                        request.password()
+                );
+
+                LoginResult result = new LoginResult(
+                        auth.username(),
+                        auth.authToken()
+                );
+
+                ctx.status(200);
+                ctx.result(gson.toJson(result));
+
+            } catch (BadRequestException e) {
+                ctx.status(400);
+                ctx.result(
+                        "{\"message\":\"Error: bad request\"}"
+                );
+
+            } catch (UnauthorizedException e) {
+                ctx.status(401);
+                ctx.result(
+                        "{\"message\":\"Error: unauthorized\"}"
+                );
+
+            } catch (DataAccessException e) {
+                ctx.status(500);
+                ctx.result(
+                        gson.toJson(
+                                new ErrorResponse(
+                                        "Error: " + e.getMessage()
+                                )
+                        )
+                );
+            }
+        });
     }
 
     public int run(int desiredPort) {
