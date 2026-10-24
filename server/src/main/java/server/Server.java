@@ -14,6 +14,7 @@ public class Server {
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
+    private final GameService gameService;
 
     private final ClearService clearService;
     private final UserService userService;
@@ -28,6 +29,7 @@ public class Server {
 
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         userService = new UserService(userDAO, authDAO);
+        gameService = new GameService(gameDAO, authDAO);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -159,6 +161,32 @@ public class Server {
                                 new ErrorResponse(
                                         "Error: " + e.getMessage()
                                 )
+                        )
+                );
+            }
+        });
+
+        // LIST GAMES
+        javalin.get("/game", ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+
+                var games = gameService.listGames(authToken);
+
+                ListGamesResult result = new ListGamesResult(games);
+
+                ctx.status(200);
+                ctx.result(gson.toJson(result));
+
+            } catch (UnauthorizedException e) {
+                ctx.status(401);
+                ctx.result("{\"message\":\"Error: unauthorized\"}");
+
+            } catch (DataAccessException e) {
+                ctx.status(500);
+                ctx.result(
+                        gson.toJson(
+                                new ErrorResponse("Error: " + e.getMessage())
                         )
                 );
             }
