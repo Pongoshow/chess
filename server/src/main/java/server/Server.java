@@ -135,6 +135,34 @@ public class Server {
                 );
             }
         });
+
+        // LOGOUT
+        javalin.delete("/session", ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+
+                userService.logout(authToken);
+
+                ctx.status(200);
+                ctx.result("{}");
+
+            } catch (UnauthorizedException e) {
+                ctx.status(401);
+                ctx.result(
+                        "{\"message\":\"Error: unauthorized\"}"
+                );
+
+            } catch (DataAccessException e) {
+                ctx.status(500);
+                ctx.result(
+                        gson.toJson(
+                                new ErrorResponse(
+                                        "Error: " + e.getMessage()
+                                )
+                        )
+                );
+            }
+        });
     }
 
     public int run(int desiredPort) {
