@@ -42,5 +42,31 @@ public class MySqlAuthDAOTests {
                 () -> authDAO.createAuth(auth));
     }
 
+    @Test
+    void getAuthNotFound() throws DataAccessException {
+        assertNull(authDAO.getAuth("invalidToken"));
+    }
+
+    @Test
+    void deleteAuthSuccess() throws DataAccessException {
+        AuthData auth = new AuthData("token123", "ian");
+
+        authDAO.createAuth(auth);
+        authDAO.deleteAuth("token123");
+
+        assertNull(authDAO.getAuth("token123"));
+    }
+
+    @Test
+    void clearAuthSuccess() throws DataAccessException {
+        authDAO.createAuth(new AuthData("token1", "ian"));
+        authDAO.createAuth(new AuthData("token2", "savanna"));
+
+        authDAO.clear();
+
+        assertNull(authDAO.getAuth("token1"));
+        assertNull(authDAO.getAuth("token2"));
+    }
+
 
 }
