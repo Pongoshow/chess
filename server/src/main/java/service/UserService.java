@@ -44,6 +44,7 @@ public class UserService {
         return auth;
     }
 
+
     public AuthData login(String username, String password)
             throws DataAccessException, UnauthorizedException, BadRequestException {
 
@@ -53,7 +54,21 @@ public class UserService {
 
         UserData user = userDAO.getUser(username);
 
-        if (user == null || !user.password().equals(password)) {
+        if (user == null) {
+            throw new UnauthorizedException("Invalid username or password");
+        }
+
+        // Check the password
+        String storedPassword = user.password();
+        boolean validPassword;
+
+        if (storedPassword.startsWith("$2a$")) {
+            validPassword = BCrypt.checkpw(password, storedPassword);
+        } else {
+            validPassword = storedPassword.equals(password);
+        }
+
+        if (!validPassword) {
             throw new UnauthorizedException("Invalid username or password");
         }
 
@@ -66,6 +81,7 @@ public class UserService {
 
         return auth;
     }
+
 
     public void logout(String authToken)
             throws DataAccessException, UnauthorizedException {
