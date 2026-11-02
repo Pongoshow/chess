@@ -2,11 +2,13 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import dataaccess.sql.MySqlDataAccess;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.UserData;
 import service.*;
+
 
 public class Server {
 
@@ -262,9 +264,16 @@ public class Server {
     }
 
     public int run(int desiredPort) {
+        try {
+            MySqlDataAccess.configureDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
+
         javalin.start(desiredPort);
         return javalin.port();
     }
+
 
     public void stop() {
         javalin.stop();
