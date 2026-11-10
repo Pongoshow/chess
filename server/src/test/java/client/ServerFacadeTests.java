@@ -121,4 +121,36 @@ public class ServerFacadeTests {
                 facade.createGame(null, auth.authToken()));
     }
 
+    @Test
+    void listGamesSuccess() {
+        var auth = facade.register("ian", "password123", "ian@email.com");
+
+        facade.createGame("Game 1", auth.authToken());
+        facade.createGame("Game 2", auth.authToken());
+
+        var games = facade.listGames(auth.authToken());
+
+        assertEquals(2, games.size());
+        assertTrue(games.stream().anyMatch(
+                game -> game.gameName().equals("Game 1")));
+        assertTrue(games.stream().anyMatch(
+                game -> game.gameName().equals("Game 2")));
+    }
+
+    @Test
+    void listGamesEmpty() {
+        var auth = facade.register("ian", "password123", "ian@email.com");
+
+        var games = facade.listGames(auth.authToken());
+
+        assertTrue(games.isEmpty());
+    }
+
+    @Test
+    void listGamesUnauthorized() {
+        assertThrows(ServerFacadeException.class, () ->
+                facade.listGames("invalidToken"));
+    }
+
+
 }

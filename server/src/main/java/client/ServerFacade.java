@@ -9,6 +9,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import model.GameData;
+import java.util.Collection;
 
 public class ServerFacade {
 
@@ -120,6 +122,28 @@ public class ServerFacade {
         throw new ServerFacadeException("Failed to create game");
     }
 
+    public Collection<GameData> listGames(String authToken) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("authorization", authToken)
+                .GET()
+                .build();
+
+        var response = sendRequest(request);
+
+        if (response.statusCode() == 200) {
+            var result = gson.fromJson(
+                    response.body(), ListGamesResult.class);
+            return result.games();
+        }
+
+        if (response.statusCode() == 401) {
+            throw new ServerFacadeException("Unauthorized");
+        }
+
+        throw new ServerFacadeException("Failed to list games");
+    }
+
     public void clear() {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + "/db"))
@@ -163,5 +187,8 @@ public class ServerFacade {
     }
 
     private record CreateGameResult(int gameID) {
+    }
+
+    private record ListGamesResult(Collection<GameData> games) {
     }
 }
