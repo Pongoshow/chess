@@ -170,6 +170,37 @@ public class ServerFacade {
         }
     }
 
+    public void joinGame(int gameID, String playerColor, String authToken) {
+        var body = gson.toJson(new JoinGameRequest(playerColor, gameID));
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("Content-Type", "application/json")
+                .header("authorization", authToken)
+                .PUT(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        var response = sendRequest(request);
+
+        if (response.statusCode() == 200) {
+            return;
+        }
+
+        if (response.statusCode() == 401) {
+            throw new ServerFacadeException("Unauthorized");
+        }
+
+        if (response.statusCode() == 403) {
+            throw new ServerFacadeException("Player color already taken");
+        }
+
+        if (response.statusCode() == 400) {
+            throw new ServerFacadeException("Invalid game information");
+        }
+
+        throw new ServerFacadeException("Failed to join game");
+    }
+
     private record RegisterRequest(
             String username,
             String password,
@@ -190,5 +221,8 @@ public class ServerFacade {
     }
 
     private record ListGamesResult(Collection<GameData> games) {
+    }
+
+    private record JoinGameRequest(String playerColor, int gameID) {
     }
 }

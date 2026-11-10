@@ -152,5 +152,49 @@ public class ServerFacadeTests {
                 facade.listGames("invalidToken"));
     }
 
+    @Test
+    void joinGameSuccess() {
+        var auth = facade.register("ian", "password123", "ian@email.com");
+
+        int id = facade.createGame("Test Game", auth.authToken());
+
+        facade.joinGame(id, "WHITE", auth.authToken());
+
+        var games = facade.listGames(auth.authToken());
+        var game = games.iterator().next();
+
+        assertEquals("ian", game.whiteUsername());
+    }
+
+    @Test
+    void joinGameColorTaken() {
+        var auth1 = facade.register("ian", "password123", "ian@email.com");
+        var auth2 = facade.register("player2", "password123", "p2@email.com");
+
+        int id = facade.createGame("Test Game", auth1.authToken());
+
+        facade.joinGame(id, "WHITE", auth1.authToken());
+
+        assertThrows(ServerFacadeException.class, () ->
+                facade.joinGame(id, "WHITE", auth2.authToken()));
+    }
+
+    @Test
+    void joinGameInvalidID() {
+        var auth = facade.register("ian", "password123", "ian@email.com");
+
+        assertThrows(ServerFacadeException.class, () ->
+                facade.joinGame(99999, "WHITE", auth.authToken()));
+    }
+
+    @Test
+    void joinGameUnauthorized() {
+        var auth = facade.register("ian", "password123", "ian@email.com");
+
+        int id = facade.createGame("Test Game", auth.authToken());
+
+        assertThrows(ServerFacadeException.class, () ->
+                facade.joinGame(id, "WHITE", "invalidToken"));
+    }
 
 }
