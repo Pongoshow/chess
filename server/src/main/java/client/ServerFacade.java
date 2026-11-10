@@ -46,6 +46,34 @@ public class ServerFacade {
         throw new ServerFacadeException("Registration failed");
     }
 
+
+    public AuthData login(String username, String password) {
+        var body = gson.toJson(new LoginRequest(username, password));
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        var response = sendRequest(request);
+
+        if (response.statusCode() == 200) {
+            return gson.fromJson(response.body(), AuthData.class);
+        }
+
+        if (response.statusCode() == 401) {
+            throw new ServerFacadeException("Invalid username or password");
+        }
+
+        if (response.statusCode() == 400) {
+            throw new ServerFacadeException("Missing login information");
+        }
+
+        throw new ServerFacadeException("Login failed");
+    }
+
+
     public void clear() {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + "/db"))
@@ -76,6 +104,12 @@ public class ServerFacade {
             String username,
             String password,
             String email
+    ) {
+    }
+
+    private record LoginRequest(
+            String username,
+            String password
     ) {
     }
 }
