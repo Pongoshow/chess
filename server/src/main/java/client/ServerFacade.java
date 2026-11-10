@@ -73,6 +73,23 @@ public class ServerFacade {
         throw new ServerFacadeException("Login failed");
     }
 
+    public void logout(String authToken) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session"))
+                .header("authorization", authToken)
+                .DELETE()
+                .build();
+
+        var response = sendRequest(request);
+
+        if (response.statusCode() == 401) {
+            throw new ServerFacadeException("Invalid auth token");
+        }
+
+        if (response.statusCode() != 200) {
+            throw new ServerFacadeException("Logout failed");
+        }
+    }
 
     public void clear() {
         var request = HttpRequest.newBuilder()

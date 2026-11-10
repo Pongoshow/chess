@@ -78,6 +78,24 @@ public class ServerFacadeTests {
                 facade.login("unknown", "password123"));
     }
 
+    @Test
+    void logoutSuccess() {
+        var auth = facade.register("ian", "password123", "ian@email.com");
+
+        assertDoesNotThrow(() -> facade.logout(auth.authToken()));
+
+        // Logging out again should fail
+        assertThrows(ServerFacadeException.class, () ->
+                facade.logout(auth.authToken()));
+    }
+
+    @Test
+    void logoutInvalidToken() {
+        assertThrows(ServerFacadeException.class, () ->
+                facade.logout("invalidToken"));
+    }
+
+
 
 
 }
