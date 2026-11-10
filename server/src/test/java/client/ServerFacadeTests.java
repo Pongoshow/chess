@@ -95,7 +95,30 @@ public class ServerFacadeTests {
                 facade.logout("invalidToken"));
     }
 
+    @Test
+    void createGameSuccess() {
+        var auth = facade.register(
+                "ian", "password123", "ian@email.com");
 
+        int gameID = facade.createGame(
+                "My Chess Game", auth.authToken());
 
+        assertTrue(gameID > 0);
+    }
+
+    @Test
+    void createGameUnauthorized() {
+        assertThrows(ServerFacadeException.class, () ->
+                facade.createGame("My Chess Game", "invalidToken"));
+    }
+
+    @Test
+    void createGameInvalidName() {
+        var auth = facade.register(
+                "ian", "password123", "ian@email.com");
+
+        assertThrows(ServerFacadeException.class, () ->
+                facade.createGame(null, auth.authToken()));
+    }
 
 }

@@ -91,6 +91,35 @@ public class ServerFacade {
         }
     }
 
+    public int createGame(String gameName, String authToken) {
+        var body = gson.toJson(new CreateGameRequest(gameName));
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("Content-Type", "application/json")
+                .header("authorization", authToken)
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        var response = sendRequest(request);
+
+        if (response.statusCode() == 200) {
+            var result = gson.fromJson(
+                    response.body(), CreateGameResult.class);
+            return result.gameID();
+        }
+
+        if (response.statusCode() == 401) {
+            throw new ServerFacadeException("Unauthorized");
+        }
+
+        if (response.statusCode() == 400) {
+            throw new ServerFacadeException("Invalid game name");
+        }
+
+        throw new ServerFacadeException("Failed to create game");
+    }
+
     public void clear() {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + "/db"))
@@ -128,5 +157,11 @@ public class ServerFacade {
             String username,
             String password
     ) {
+    }
+
+    private record CreateGameRequest(String gameName) {
+    }
+
+    private record CreateGameResult(int gameID) {
     }
 }
