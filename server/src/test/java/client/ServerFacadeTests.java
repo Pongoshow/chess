@@ -53,5 +53,31 @@ public class ServerFacadeTests {
                 facade.register("ian", "password123", "ian@email.com"));
     }
 
+    @Test
+    void loginSuccess() {
+        facade.register("ian", "password123", "ian@email.com");
+
+        var result = facade.login("ian", "password123");
+
+        assertNotNull(result);
+        assertEquals("ian", result.username());
+        assertNotNull(result.authToken());
+    }
+
+    @Test
+    void loginWrongPassword() {
+        facade.register("ian", "password123", "ian@email.com");
+
+        assertThrows(ServerFacadeException.class, () ->
+                facade.login("ian", "wrongPassword"));
+    }
+
+    @Test
+    void loginUserNotFound() {
+        assertThrows(ServerFacadeException.class, () ->
+                facade.login("unknown", "password123"));
+    }
+
+
 
 }
