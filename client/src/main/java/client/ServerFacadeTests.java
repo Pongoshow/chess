@@ -40,9 +40,9 @@ public class ServerFacadeTests {
         var result = facade.register("ian", "password123", "ian@email.com");
 
         assertNotNull(result);
-        assertEquals("ian", result.username());
+        Assertions.assertEquals("ian", result.username());
         assertNotNull(result.authToken());
-        assertFalse(result.authToken().isEmpty());
+        Assertions.assertFalse(result.authToken().isEmpty());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ServerFacadeTests {
         var result = facade.login("ian", "password123");
 
         assertNotNull(result);
-        assertEquals("ian", result.username());
+        Assertions.assertEquals("ian", result.username());
         assertNotNull(result.authToken());
     }
 
@@ -130,10 +130,10 @@ public class ServerFacadeTests {
 
         var games = facade.listGames(auth.authToken());
 
-        assertEquals(2, games.size());
-        assertTrue(games.stream().anyMatch(
+        Assertions.assertEquals(2, games.size());
+        Assertions.assertTrue(games.stream().anyMatch(
                 game -> game.gameName().equals("Game 1")));
-        assertTrue(games.stream().anyMatch(
+        Assertions.assertTrue(games.stream().anyMatch(
                 game -> game.gameName().equals("Game 2")));
     }
 
@@ -143,7 +143,7 @@ public class ServerFacadeTests {
 
         var games = facade.listGames(auth.authToken());
 
-        assertTrue(games.isEmpty());
+        Assertions.assertTrue(games.isEmpty());
     }
 
     @Test
@@ -163,7 +163,7 @@ public class ServerFacadeTests {
         var games = facade.listGames(auth.authToken());
         var game = games.iterator().next();
 
-        assertEquals("ian", game.whiteUsername());
+        Assertions.assertEquals("ian", game.whiteUsername());
     }
 
     @Test
