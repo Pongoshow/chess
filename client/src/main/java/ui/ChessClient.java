@@ -83,13 +83,18 @@ public class ChessClient {
     // REGISTER
     private void register() {
         System.out.print("Username: ");
-        String username = scanner.nextLine();
+        String username = scanner.nextLine().trim();
 
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
         System.out.print("Email: ");
-        String email = scanner.nextLine();
+        String email = scanner.nextLine().trim();
+
+        if (username.isBlank() || password.isBlank() || email.isBlank()) {
+            System.out.println("Username, password, and email cannot be blank.");
+            return;
+        }
 
         var auth = facade.register(username, password, email);
 

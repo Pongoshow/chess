@@ -197,4 +197,13 @@ public class ServerFacadeTests {
                 facade.joinGame(id, "WHITE", "invalidToken"));
     }
 
+    @Test
+    void registerEmptyInformation() {
+        assertThrows(ServerFacadeException.class, () ->
+                facade.register("", "", ""));
+
+        assertThrows(ServerFacadeException.class, () ->
+                facade.register("   ", "   ", "   "));
+    }
+
 }
